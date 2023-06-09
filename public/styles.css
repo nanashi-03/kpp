@@ -1,7 +1,8 @@
 body {
     min-height: 100vh;
-    background: #212534;
-    display: flex;
+    background-color: #212534;
+    color: #c29a77;
+    display: grid;
     align-items: center;
     flex-direction: column;
     padding-top: 2rem;
@@ -9,11 +10,18 @@ body {
     box-sizing: border-box;
 }
 
+.checkboxes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
 .kanjis {
     display: grid;
     align-items: center;
     margin: 3rem;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 20px;
 }
 
@@ -22,3 +30,8 @@ body {
     align-items: center;
     text-align: center;
 }
+
+#submitBtn {
+    width: auto;
+    justify-self: center;
+  }

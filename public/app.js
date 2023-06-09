@@ -1,7 +1,7 @@
 $(function () {
     $.getJSON('Kanjidic.json')
         .done(function (data) {
-            if (Array.isArray(data.kanjis)) {
+            if (data) {
                 var kanjis = data.kanjis;
                 $('.checkboxes input[type="checkbox"]').on('change', function () {
                     var selectedLevels = $('.checkboxes input[type="checkbox"]:checked').map(function () {
@@ -10,7 +10,7 @@ $(function () {
                     displayKanjis(kanjis, selectedLevels);
                 });
             } else {
-                console.error('Invalid JSON data: Kanjis is not an array');
+                console.error('Invalid JSON data');
             }
         })
         .fail(function (jqxhr, textStatus, error) {
@@ -23,24 +23,36 @@ $(function () {
     });
 
     function displayKanjis(kanjis, levels) {
-        var filteredKanjis = kanjis.filter(function (kanji) {
-            return levels.includes(kanji.jlpt);
-        });
+        var filteredKanjis = {};
+
+        for (var key in kanjis) {
+            if (levels.includes(String(kanjis[key].jlpt))) {
+                filteredKanjis[key] = kanjis[key];
+            }
+        }
 
         $('.kanjis').empty();
 
-        filteredKanjis.forEach(function (kanji) {
-            var literal = kanji.kanji;
+        for (var key in filteredKanjis) {
+            if (filteredKanjis.hasOwnProperty(key)) {
+                var kanji = filteredKanjis[key];
+                var literal = kanji.kanji;
 
-            var kanjiDiv = $('<div>').addClass('kanji-item');
+                var kanjiDiv = $('<div>').addClass('kanji-item');
 
-            var kanjiSpan = $('<span>').text(literal);
-            kanjiDiv.append(kanjiSpan);
+                var checkbox = $('<input>')
+                    .attr('type', 'checkbox')
+                    .attr('value', literal)
+                    .addClass('checkbox-item');
 
-            var checkbox = $('<input>').attr('type', 'checkbox').attr('value', literal).attr('');
-            kanjiDiv.append(checkbox);
+                var label = $('<label>')
+                    .addClass('checkbox-label')
+                    .append(literal, '<br>', checkbox);
 
-            $('.kanjis').append(kanjiDiv);
-        });
+                kanjiDiv.append(label);
+
+                $('.kanjis').append(kanjiDiv);
+            }
+        }
     }
 });
