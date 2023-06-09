@@ -1,21 +1,27 @@
 $(function () {
-    $.getJSON('Kanjidic.json')
-        .done(function (data) {
-            if (data) {
-                var kanjis = data.kanjis;
-                $('.checkboxes input[type="checkbox"]').on('change', function () {
-                    var selectedLevels = $('.checkboxes input[type="checkbox"]:checked').map(function () {
-                        return this.value;
-                    }).get();
-                    displayKanjis(kanjis, selectedLevels);
-                });
-            } else {
-                console.error('Invalid JSON data');
-            }
-        })
-        .fail(function (jqxhr, textStatus, error) {
-            console.error('Error loading JSON file:', error);
-        });
+    function getJLPT(ch) {
+        let kanjiData;
+        fetch(`https://kanjiapi.dev/v1/kanji/${ch}`, {mode: 'cors'})
+            .then(res => res.json())
+            .then(data => {
+                kanjiData = data.jlpt
+            })
+            .catch(error => console.error(error))
+        return kanjiData
+    }
+    let kanjis;
+    fetch('https://kanjiapi.dev/v1/kanji/joyo', {mode: 'cors'})
+        .then(res => res.json())
+        .then(data => kanjis = data)
+        .catch(error => console.error(error))
+
+    $('.checkboxes input[type="checkbox"]').on('change', function () {
+        var selectedLevels = $('.checkboxes input[type="checkbox"]:checked').map(function () {
+            return this.value;
+        }).get();
+
+        displayKanjis(kanjis, selectedLevels);
+    });
 
     $('#submitBtn').on('click', function () {
         var checkedCount = $('.kanjis input[type="checkbox"]:checked').length;
@@ -23,36 +29,25 @@ $(function () {
     });
 
     function displayKanjis(kanjis, levels) {
-        var filteredKanjis = {};
-
-        for (var key in kanjis) {
-            if (levels.includes(String(kanjis[key].jlpt))) {
-                filteredKanjis[key] = kanjis[key];
-            }
-        }
+        const filteredKanjis = kanjis.filter(kanji => levels.includes(String(getJLPT(kanji))));
 
         $('.kanjis').empty();
 
-        for (var key in filteredKanjis) {
-            if (filteredKanjis.hasOwnProperty(key)) {
-                var kanji = filteredKanjis[key];
-                var literal = kanji.kanji;
+        filteredKanjis.forEach(kanji => {
+            var kanjiDiv = $('<div>').addClass('kanji-item');
 
-                var kanjiDiv = $('<div>').addClass('kanji-item');
+            var checkbox = $('<input>')
+                .attr('type', 'checkbox')
+                .attr('value', kanji)
+                .addClass('checkbox-item');
 
-                var checkbox = $('<input>')
-                    .attr('type', 'checkbox')
-                    .attr('value', literal)
-                    .addClass('checkbox-item');
+            var label = $('<label>')
+                .addClass('checkbox-label')
+                .append(kanji, '<br>', checkbox);
 
-                var label = $('<label>')
-                    .addClass('checkbox-label')
-                    .append(literal, '<br>', checkbox);
+            kanjiDiv.append(label);
 
-                kanjiDiv.append(label);
-
-                $('.kanjis').append(kanjiDiv);
-            }
-        }
+            $('.kanjis').append(kanjiDiv);
+        });
     }
 });
