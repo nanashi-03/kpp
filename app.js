@@ -2151,6 +2151,65 @@ $(function () {
         alert(`You know ${checkedCount} kanjis!`)
     });
 
+    $('#downloadBtn').on('click', function() {
+        let selectedLevels = $('.checkboxes input[type="checkbox"]:checked').map(function() {
+            return this.value;
+        }).get()
+        let selectedKanjis = $('.kanjis input[type="checkbox"]:checked').map(function() {
+            return this.value;
+        }).get();
+        content = selectedLevels.join('\n') + ":\n" + selectedKanjis.join('\n')
+        downloadKanjis(content)
+    })
+
+    $('#loading').on('change', function(event) {
+        const file = event.target.files[0];
+        var reader = new FileReader()
+
+        reader.onload = function(e) {
+            const filecontent = e.target.result
+            const levelarray = filecontent.split(':\n').map(item => item.trim())
+            const levelcontent = levelarray[0].split('\n').map(item => item.trim())
+            const arraycontent = levelarray[1].split('\n').map(item => item.trim())
+            checkCheckboxes(levelcontent, arraycontent)
+        }
+        reader.readAsText(file)
+    })
+
+    function checkCheckboxes(levelcontent, arraycontent) {
+        levelboxes = [...$('.checkboxes input[type="checkbox"]')]
+        levelboxes.forEach(level => {
+            level.checked = false
+        })
+        levelboxes.forEach(level => {
+            if(levelcontent.includes(level.value))
+                level.checked = true
+        });
+
+        levelboxes[0].click()
+        levelboxes[0].click()
+
+
+        checkboxes = [...$('.kanjis input[type="checkbox"]')]
+        checkboxes.forEach(check => {
+            check.checked = false
+        })
+        checkboxes.forEach(check => {
+            if(arraycontent.includes(check.value))
+                check.checked = true        
+        });
+    }
+
+    function downloadKanjis(content) {
+        const blob = new Blob([content])
+        const dllink = document.createElement('a')
+        dllink.href = URL.createObjectURL(blob)
+        dllink.download = 'kanjilist.txt'
+        dllink.click()
+        URL.revokeObjectURL(dllink.href)
+        dllink.remove()
+    }
+
     function displayKanjis(levels) {
         $('.kanjis').empty();
 

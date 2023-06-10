@@ -31,7 +31,13 @@ body {
     text-align: center;
 }
 
-#submitBtn {
-    width: auto;
-    justify-self: center;
-  }
+.btncont {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#loading {
+    display: none;
+}
