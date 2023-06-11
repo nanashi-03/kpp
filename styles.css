@@ -41,3 +41,13 @@ body {
 #loading {
     display: none;
 }
+
+button, .btncont>label {
+    font-family: 'Noto Sans';
+    font-size: 13px;
+    padding: 15px;
+    border: 1px solid #c29a77;
+    background-color: #212534;
+    color: #c29a77;
+    display: inline-block;
+}
